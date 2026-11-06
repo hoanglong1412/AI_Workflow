@@ -1,0 +1,37 @@
+name: Claude Fix Issue
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  fix:
+    # Approval gate: only runs after a user adds the claude-approved label
+    if: github.event.label.name == 'claude-approved'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Implement the approved solution for issue #${{ github.event.issue.number }}
+            in ${{ github.repository }}.
+            Read it with `gh issue view <number> --comments` and follow the proposed
+            solution from the discussion. Do not widen the scope.
+            1. Create branch fixbug/issue_${{ github.event.issue.number }} from main.
+            2. Make the fix and commit it.
+            3. Push the branch.
+            4. Open a PR into main with `gh pr create`, and include
+               "Fixes #${{ github.event.issue.number }}" in the description.
+            5. Comment the PR link on the issue.
+          claude_args: |
+            --max-turns 30
+            --allowedTools "Read,Glob,Grep,Edit,Write,Bash(git:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh pr create:*)"

@@ -1,0 +1,40 @@
+name: Claude Analyze Issue
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  analyze:
+    # Runs when the label is added, or on an @claude reply in a labeled issue
+    if: >-
+      (github.event_name == 'issues' && github.event.label.name == 'claude-analyze') ||
+      (github.event_name == 'issue_comment' &&
+       !github.event.issue.pull_request &&
+       contains(github.event.comment.body, '@claude') &&
+       contains(github.event.issue.labels.*.name, 'claude-analyze'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Analyze issue #${{ github.event.issue.number }} in ${{ github.repository }}.
+            Read it and all its comments with `gh issue view <number> --comments`.
+            Investigate the source code, but do NOT change any file.
+            Then post ONE comment with `gh issue comment`:
+            - If you have enough information: "Root cause" and "Proposed solution".
+            - If not: list your questions and ask the user to reply with @claude.
+          # Read-only tools: this workflow must never edit code
+          claude_args: |
+            --max-turns 20
+            --allowedTools "Read,Glob,Grep,Bash(gh issue view:*),Bash(gh issue comment:*)"
