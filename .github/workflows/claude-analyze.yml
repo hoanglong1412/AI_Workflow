@@ -23,6 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: anthropics/claude-code-action@v1
+        id: claude
         env:
           GH_TOKEN: ${{ github.token }}
         with:
@@ -38,3 +39,10 @@ jobs:
           claude_args: |
             --max-turns 20
             --allowedTools "Read,Glob,Grep,Bash(gh issue view:*),Bash(gh issue comment:*)"
+
+      # The action hides Claude's output, so print only the final result on failure
+      - name: Show Claude error
+        if: failure()
+        env:
+          EXECUTION_FILE: ${{ steps.claude.outputs.execution_file }}
+        run: jq -r '.. | objects | select(.type? == "result") | .result' "$EXECUTION_FILE"
