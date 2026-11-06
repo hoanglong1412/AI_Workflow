@@ -1,0 +1,47 @@
+# Workflow name, shown in the Actions tab on GitHub
+name: Build Release
+
+# Trigger: run on every push to any branch
+on:
+  push:
+
+jobs:
+  # Job name (a workflow can have multiple jobs)
+  build-release:
+    # Windows virtual machine provided by GitHub (CMake and Visual Studio preinstalled)
+    runs-on: windows-latest
+
+    # All "run:" steps execute inside the hello_world directory by default
+    # (CMakeLists.txt lives there, not at the repo root)
+    # Note: this does not apply to "uses:" steps
+    defaults:
+      run:
+        working-directory: hello_world
+
+    # Steps run sequentially; if one fails, the job stops and is marked red
+    steps:
+      # Download the repository code onto the VM
+      - uses: actions/checkout@v4
+
+      # Generate the build files into the build directory
+      # -S . : source directory, -B build : build directory
+      - name: Configure
+        run: cmake -S . -B build
+
+      # Compile in Release mode
+      - name: Build (Release)
+        run: cmake --build build --config Release
+
+      # Run the program to make sure the built binary works
+      - name: Run
+        run: .\build\Release\hello.exe
+
+      # Save hello.exe to GitHub (Actions tab, Artifacts section) for download
+      # This is a temporary file (90 days by default), not a GitHub Release
+      # path must be the full path from the repo root because working-directory
+      # does not apply to "uses:" steps
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-release
+          path: hello_world/build/Release/hello.exe
