@@ -1,0 +1,53 @@
+name: New feature
+description: Propose a new feature or an improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the need, not only the solution. Claude will explore it with you
+        and turn it into an OpenSpec proposal and task list.
+        Add the `spec` label when the issue is ready to start a Claude session.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What problem does this solve? Who needs it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What should the feature do? Rough ideas are fine.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How do we know it is done? These become test cases.
+      placeholder: |
+        - [ ] Running `hello --name Bob` prints "Hello, Bob!"
+        - [ ] Running without arguments keeps the current output
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Out of scope
+      description: What should NOT be changed or included.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Mockups, references, related issues...

@@ -1,0 +1,73 @@
+name: Bug report
+description: Report something that is broken or behaves incorrectly
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Clear steps and logs help Claude find the root cause faster.
+        Add the `spec` label when the issue is ready to start a Claude session.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is wrong?
+      placeholder: The program prints the wrong greeting...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `build_run.bat Release`
+        2. ...
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / output
+      description: Paste error messages or console output. Formatted as code automatically.
+      render: shell
+
+  - type: dropdown
+    id: config
+    attributes:
+      label: Build configuration
+      options:
+        - Release
+        - Debug
+        - Both
+        - Not sure
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Windows 11, Visual Studio 2022, CMake 3.29
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Suspected cause, related files, screenshots...
